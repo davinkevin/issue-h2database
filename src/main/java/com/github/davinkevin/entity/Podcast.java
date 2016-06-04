@@ -1,8 +1,6 @@
 package com.github.davinkevin.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -23,7 +21,6 @@ import java.util.UUID;
 @Getter @Setter
 @Accessors(chain = true)
 @NoArgsConstructor @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true, value = {"signature", "items", "contains", "add", "lastUpdateToNow" })
 public class Podcast implements Serializable {
 
     public static final Podcast DEFAULT_PODCAST = new Podcast();
@@ -34,37 +31,28 @@ public class Podcast implements Serializable {
     @Column(columnDefinition = "UUID")
     private UUID id;
 
-    @JsonView(PodcastListingView.class)
     private String title;
 
     @Column(length = 65535)
-    @JsonView(PodcastDetailsView.class)
     private String url;
     private String signature;
-
-    @JsonView(PodcastListingView.class)
     private String type;
-
-    @JsonView(PodcastListingView.class)
     private ZonedDateTime lastUpdate;
+
 
     @OneToMany(mappedBy = "podcast", fetch = FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
     @OrderBy("PUB_DATE DESC")
     @Fetch(FetchMode.SUBSELECT)
     private Set<Item> items = new HashSet<>();
 
-    @JsonView(PodcastListingView.class)
     @OneToOne(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval=true)
     private Cover cover;
 
     @Column(length = 65535 )
-    @JsonView(PodcastDetailsView.class)
     private String description;
 
-    @JsonView(PodcastDetailsView.class)
     private Boolean hasToBeDeleted;
 
-    @JsonView(PodcastDetailsView.class)
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER) @Fetch(FetchMode.SUBSELECT)
     @JoinTable(name = "PODCAST_TAGS", joinColumns = @JoinColumn(name = "PODCASTS_ID"), inverseJoinColumns = @JoinColumn(name = "TAGS_ID"))
     private Set<Tag> tags = new HashSet<>();

@@ -1,0 +1,18 @@
+spring :
+    h2.console.enabled : true
+    datasource:
+        #url: jdbc:h2:/tmp/force-insert;TRACE_LEVEL_FILE=0;MVCC=true; # For v1.3 of H2
+        url: jdbc:h2:/tmp/force-insert
+        username: sa
+        driver-class-name: org.h2.Driver
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        show-sql: false
+        hibernate :
+            ddl-auto: update
+        properties :
+            hibernate:
+                format_sql: true
+            jadira:
+              usertype:
+                autoRegisterUserTypes: true

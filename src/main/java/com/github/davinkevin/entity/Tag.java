@@ -1,6 +1,5 @@
 package com.github.davinkevin.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -21,7 +20,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter @Setter
 @Accessors(chain = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Tag {
 
     @Id

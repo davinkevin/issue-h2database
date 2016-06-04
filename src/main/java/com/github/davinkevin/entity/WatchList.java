@@ -1,6 +1,5 @@
 package com.github.davinkevin.entity;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Sets;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -30,7 +29,6 @@ public class WatchList {
     private String name;
 
     @ManyToMany
-    @JsonView(WatchListDetailsListView.class)
     private Set<Item> items = Sets.newHashSet();
 
     public WatchList add(Item item) {

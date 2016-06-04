@@ -1,7 +1,5 @@
 package com.github.davinkevin.entity;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 /**
  * Created by kevin on 18/02/15.
  */
@@ -13,7 +11,6 @@ public enum Status {
     STOPPED,
     PAUSED;
 
-    @JsonCreator
     public static Status of(String value) {
         return Status.valueOf(value);
     }

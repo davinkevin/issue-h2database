@@ -1,6 +1,5 @@
 package com.github.davinkevin.entity;
 
-import com.fasterxml.jackson.annotation.*;
 import com.google.common.collect.Sets;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -13,7 +12,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import javax.validation.constraints.AssertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,7 +30,6 @@ import static java.util.Objects.nonNull;
 @Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames={"podcast_id", "url"}))
 @Accessors(chain = true)
 @NoArgsConstructor @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true, value = { "numberOfTry", "localUri", "addATry", "deleteDownloadedFile", "localPath", "proxyURLWithoutExtention", "extention", "hasValidURL", "reset" })
 @EntityListeners(AuditingEntityListener.class)
 public class Item {
 
@@ -50,54 +47,37 @@ public class Item {
     private Cover cover;
 
     @ManyToOne(cascade={CascadeType.MERGE}, fetch = FetchType.EAGER)
-    @JsonBackReference("podcast-item")
     private Podcast podcast;
-
-    @JsonView(ItemSearchListView.class)
     private String title;
 
     @Column(length = 65535)
-    @JsonView(ItemSearchListView.class)
     private String url;
-
-    @JsonView(ItemPodcastListView.class)
     private ZonedDateTime pubDate;
 
     @Column(length = 2147483647)
-    @JsonView(ItemPodcastListView.class)
     private String description;
 
-    @JsonView(ItemSearchListView.class)
     private String mimeType;
-
-    @JsonView(ItemDetailsView.class)
     private Long length;
-
-    @JsonView(ItemDetailsView.class)
     private String fileName;
 
     /* Value for the Download */
     @Enumerated(EnumType.STRING)
-    @JsonView(ItemSearchListView.class)
     private Status status = Status.NOT_DOWNLOADED;
 
     @Transient
-    @JsonView(ItemDetailsView.class)
     private Integer progression = 0;
 
     @Transient
     private Integer numberOfTry = 0;
 
-    @JsonView(ItemDetailsView.class)
     private ZonedDateTime downloadDate;
 
     @CreatedDate
     private ZonedDateTime creationDate;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "items", cascade = CascadeType.REFRESH)
     private Set<WatchList> watchLists = Sets.newHashSet();
-
 
     public String getLocalUri() {
         return (fileName == null) ? null : getLocalPath().toString();
@@ -156,12 +136,12 @@ public class Item {
                 '}';
     }
 
-    @Transient @JsonProperty("proxyURL") @JsonView(ItemSearchListView.class)
+    @Transient
     public String getProxyURL() {
         return String.format(PROXY_URL, podcast.getId(), id, getExtention());
     }
 
-    @Transient @JsonProperty("isDownloaded") @JsonView(ItemSearchListView.class)
+    @Transient
     public Boolean isDownloaded() {
         return StringUtils.isNotEmpty(fileName);
     }
@@ -187,7 +167,7 @@ public class Item {
         }
     }
 
-    @Transient @JsonIgnore
+    @Transient
     public Item deleteDownloadedFile() {
         deleteFile();
         status = Status.DELETED;
@@ -208,15 +188,10 @@ public class Item {
         return (ext == null) ? "" : "."+ext;
     }
 
-    @JsonProperty("cover") @JsonView(ItemSearchListView.class)
     public Cover getCoverOfItemOrPodcast() {
         return isNull(this.cover) ? podcast.getCover() : this.cover;
     }
-
-    @JsonProperty("podcastId") @JsonView(ItemSearchListView.class)
     public UUID getPodcastId() { return isNull(podcast) ? null : podcast.getId();}
-
-    @AssertTrue
     public boolean hasValidURL() {
         return (!StringUtils.isEmpty(this.url)) || "send".equals(this.podcast.getType());
     }
@@ -228,8 +203,4 @@ public class Item {
         fileName = null;
         return this;
     }
-
-    public interface ItemSearchListView {}
-    public interface ItemPodcastListView extends ItemSearchListView {}
-    public interface ItemDetailsView extends ItemPodcastListView {}
 }
